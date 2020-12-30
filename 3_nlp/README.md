@@ -6,5 +6,5 @@ Natrual Langauge Processing involves the intersection of computers and langauge.
 In this module we will learn how to solve a simple question and answering problem NLP problem with PyTorch. Along the way you will the learn the fundemental skills you need to model your own natural language processing tasks.
 
 - Representing Text (BoW, Word2Vec, Contextual Embeddings)
-- Transfer Learning with Transformers
-- PyTorch NLP Question and Answering Demo with Hugging Face 
+- Neural Language Modeling (From MLPs to Transformers)
+- Simple Transfer Learning Demo (HuggingFace DistilBert Question and Answering)
