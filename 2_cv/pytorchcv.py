@@ -3,9 +3,11 @@
 import builtins
 import torch
 import torch.nn as nn
+from torch.utils import data
 import torchvision
 from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
+import numpy as np
 
 def load_mnist(batch_size=64):
     builtins.data_train = torchvision.datasets.MNIST('./data',
@@ -56,6 +58,27 @@ def train(net,train_loader,test_loader,optimizer=None,lr=0.01,epochs=10,loss_fn=
         res['val_acc'].append(va)
     return res
 
+def train_long(net,train_loader,test_loader,epochs=5,lr=0.01,optimizer=None,loss_fn = nn.NLLLoss(),print_freq=10):
+    optimizer = optimizer or torch.optim.Adam(net.parameters(),lr=lr)
+    for epoch in range(epochs):
+        net.train()
+        total_loss,acc,count = 0,0,0
+        for i, (features,labels) in enumerate(train_loader):
+            optimizer.zero_grad()
+            out = net(features)
+            loss = loss_fn(out,labels) #cross_entropy(out,labels)
+            loss.backward()
+            optimizer.step()
+            total_loss+=loss
+            _,predicted = torch.max(out,1)
+            acc+=(predicted==labels).sum()
+            count+=len(labels)
+            if i%print_freq==0:
+                print("Epoch {}, minibatch {}: train acc = {}, train loss = {}".format(epoch,i,acc.item()/count,total_loss.item()/count))
+        vl,va = validate(net,test_loader,loss_fn)
+        print("Epoch {} done, validation acc = {}, validation loss = {}".format(epoch,va,vl))
+
+
 def plot_results(hist):
     plt.figure(figsize=(15,5))
     plt.subplot(121)
@@ -85,3 +108,12 @@ def plot_convolution(t,title=''):
         #plt.tight_layout()
         plt.show()
         
+def display_dataset(dataset, n=10,classes=None):
+    fig,ax = plt.subplots(1,n,figsize=(15,3))
+    mn = min([dataset[i][0].min() for i in range(n)])
+    mx = max([dataset[i][0].max() for i in range(n)])
+    for i in range(n):
+        ax[i].imshow(np.transpose((dataset[i][0]-mn)/(mx-mn),(1,2,0)))
+        ax[i].axis('off')
+        if classes:
+            ax[i].set_title(classes[dataset[i][1]])
