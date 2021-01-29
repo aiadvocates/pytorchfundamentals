@@ -3,4 +3,3 @@ Pillow
 numpy
 matplotlib
 torchsummary
-kaggle-cli
