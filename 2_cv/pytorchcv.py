@@ -8,6 +8,12 @@ import torchvision
 from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
+import glob
+import os
+import zipfile 
+
+default_device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def load_mnist(batch_size=64):
     builtins.data_train = torchvision.datasets.MNIST('./data',
@@ -23,13 +29,14 @@ def train_epoch(net,dataloader,lr=0.01,optimizer=None,loss_fn = nn.NLLLoss()):
     total_loss,acc,count = 0,0,0
     for features,labels in dataloader:
         optimizer.zero_grad()
-        out = net(features)
-        loss = loss_fn(out,labels) #cross_entropy(out,labels)
+        lbls = labels.to(default_device)
+        out = net(features.to(default_device))
+        loss = loss_fn(out,lbls) #cross_entropy(out,labels)
         loss.backward()
         optimizer.step()
         total_loss+=loss
         _,predicted = torch.max(out,1)
-        acc+=(predicted==labels).sum()
+        acc+=(predicted==lbls).sum()
         count+=len(labels)
     return total_loss.item()/count, acc.item()/count
 
@@ -38,10 +45,11 @@ def validate(net, dataloader,loss_fn=nn.NLLLoss()):
     count,acc,loss = 0,0,0
     with torch.no_grad():
         for features,labels in dataloader:
-            out = net(features)
-            loss += loss_fn(out,labels) 
+            lbls = labels.to(default_device)
+            out = net(features.to(default_device))
+            loss += loss_fn(out,lbls) 
             pred = torch.max(out,1)[1]
-            acc += (pred==labels).sum()
+            acc += (pred==lbls).sum()
             count += len(labels)
     return loss.item()/count, acc.item()/count
 
@@ -64,14 +72,15 @@ def train_long(net,train_loader,test_loader,epochs=5,lr=0.01,optimizer=None,loss
         net.train()
         total_loss,acc,count = 0,0,0
         for i, (features,labels) in enumerate(train_loader):
+            lbls = labels.to(default_device)
             optimizer.zero_grad()
-            out = net(features)
-            loss = loss_fn(out,labels) #cross_entropy(out,labels)
+            out = net(features.to(default_device))
+            loss = loss_fn(out,lbls)
             loss.backward()
             optimizer.step()
             total_loss+=loss
             _,predicted = torch.max(out,1)
-            acc+=(predicted==labels).sum()
+            acc+=(predicted==lbls).sum()
             count+=len(labels)
             if i%print_freq==0:
                 print("Epoch {}, minibatch {}: train acc = {}, train loss = {}".format(epoch,i,acc.item()/count,total_loss.item()/count))
@@ -117,3 +126,43 @@ def display_dataset(dataset, n=10,classes=None):
         ax[i].axis('off')
         if classes:
             ax[i].set_title(classes[dataset[i][1]])
+
+
+def check_image(fn):
+    try:
+        im = Image.open(fn)
+        im.verify()
+        return True
+    except:
+        return False
+    
+def check_image_dir(path):
+    for fn in glob.glob(path):
+        if not check_image(fn):
+            print("Corrupt image: {}".format(fn))
+            os.remove(fn)
+
+
+def common_transform():
+    std_normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                          std=[0.229, 0.224, 0.225])
+    trans = torchvision.transforms.Compose([
+            torchvision.transforms.Resize(256),
+            torchvision.transforms.CenterCrop(224),
+            torchvision.transforms.ToTensor(), 
+            std_normalize])
+    return trans
+
+def load_cats_dogs_dataset():
+    if not os.path.exists('data/PetImages'):
+        with zipfile.ZipFile('data/kagglecatsanddogs_3367a.zip', 'r') as zip_ref:
+            zip_ref.extractall('data')
+
+    check_image_dir('data/PetImages/Cat/*.jpg')
+    check_image_dir('data/PetImages/Dog/*.jpg')
+
+    dataset = torchvision.datasets.ImageFolder('data/PetImages',transform=common_transform())
+    trainset, testset = torch.utils.data.random_split(dataset,[20000,len(dataset)-20000])
+    trainloader = torch.utils.data.DataLoader(trainset,batch_size=32)
+    testloader = torch.utils.data.DataLoader(trainset,batch_size=32)
+    return dataset, trainloader, testloader
