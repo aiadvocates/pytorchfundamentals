@@ -1,5 +1,5 @@
 ### YamlMime:ModuleUnit
-uid: learn..9-summary
+uid: learn..5-summary
 title: Introduction
 metadata:
   title: Introduction
@@ -11,4 +11,4 @@ metadata:
   ms.prod: vs
 durationInMinutes: 1
 content: |
-  [!include[](includes/9-summary.md)]
+  [!include[](includes/5-summary.md)]

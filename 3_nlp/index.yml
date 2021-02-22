@@ -23,6 +23,10 @@ products:
 prerequisites: None
 units:
 - learn..1-introduction
+- learn..2-representing-text
+- learn..3-modeling-language
+- learn..4-qna-pytorch
+- learn..5-summary
 
 badge:
   uid: learn..badge
