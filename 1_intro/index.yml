@@ -23,6 +23,14 @@ products:
 prerequisites: None
 units:
 - learn..1-introduction
+- learn..2-ml-overview
+- learn..3-tensors
+- learn..4-data
+- learn..5-model
+- learn..6-loss
+- learn..7-optimization
+- learn..8-inference
+- learn..9-summary
 
 badge:
   uid: learn..badge
