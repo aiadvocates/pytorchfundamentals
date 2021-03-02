@@ -1,0 +1,5 @@
+numpy
+matplotlib
+torchsummary
+torchtext
+gensim
