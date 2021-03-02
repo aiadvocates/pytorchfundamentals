@@ -17,8 +17,9 @@ def train_epoch(net,dataloader,lr=0.01,optimizer=None,loss_fn = torch.nn.CrossEn
     total_loss,acc,count,i = 0,0,0,0
     for labels,features in dataloader:
         optimizer.zero_grad()
-        out = net(features.to(device))
-        loss = loss_fn(out,labels.to(device)) #cross_entropy(out,labels)
+        features, labels = features.to(device), labels.to(device)
+        out = net(features)
+        loss = loss_fn(out,labels) #cross_entropy(out,labels)
         loss.backward()
         optimizer.step()
         total_loss+=loss
