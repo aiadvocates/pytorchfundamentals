@@ -55,3 +55,27 @@ def offsetify(b):
         torch.cat(x), # text 
         o
     )
+
+def train_epoch_emb(net,dataloader,lr=0.01,optimizer=None,loss_fn = torch.nn.CrossEntropyLoss(),epoch_size=None, report_freq=200):
+    optimizer = optimizer or torch.optim.Adam(net.parameters(),lr=lr)
+    loss_fn = loss_fn.to(device)
+    net.train()
+    total_loss,acc,count,i = 0,0,0,0
+    for labels,text,off in dataloader:
+        optimizer.zero_grad()
+        labels,text,off = labels.to(device), text.to(device), off.to(device)
+        out = net(text, off)
+        loss = loss_fn(out,labels) #cross_entropy(out,labels)
+        loss.backward()
+        optimizer.step()
+        total_loss+=loss
+        _,predicted = torch.max(out,1)
+        acc+=(predicted==labels).sum()
+        count+=len(labels)
+        i+=1
+        if i%report_freq==0:
+            print(f"{count}: acc={acc.item()/count}")
+        if epoch_size and count>epoch_size:
+            break
+    return total_loss.item()/count, acc.item()/count
+
