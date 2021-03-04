@@ -23,6 +23,10 @@ products:
 prerequisites: None
 units:
 - learn..1-introduction
+- learn..2-understanding-audio-data
+- learn..3-visualizations-transforms
+- learn..4-speech-model
+- learn..5-summary
 
 badge:
   uid: learn..badge
