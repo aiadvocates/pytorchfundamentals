@@ -1,0 +1,14 @@
+### YamlMime:ModuleUnit
+uid: learn..7-summary
+title: Summary and Takeaways
+metadata:
+  title: Summary and Takeaways
+  description: In this final unit, we summarize what we have learnt, and what should you focus on next if you want to continue your journey into NLP.
+  author: 
+  ms.author: 
+  ms.date: 04/14/2020
+  ms.topic: interactive-tutorial
+  ms.prod: vs
+durationInMinutes: 1
+content: |
+  [!include[](includes/7-summary.md)]
