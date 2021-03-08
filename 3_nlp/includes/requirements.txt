@@ -3,3 +3,6 @@ matplotlib
 torchsummary
 torchtext
 gensim
+transformers
+huggingface
+
